@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>首爾 x 釜山 雙城旅遊書</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .safe-area-pb { padding-bottom: calc(env(safe-area-inset-bottom) + 80px); }
+        .tab-btn.active { color: #4f46e5; }
+        .tab-btn { color: #9ca3af; transition: color 0.2s; }
+    </style>
+</head>
+<body class="bg-slate-50 text-gray-800 antialiased">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="max-w-md mx-auto px-4 py-5 flex items-center justify-center">
+            <i class="fas fa-heart text-pink-500 mr-2"></i>
+            <h1 class="text-xl font-black tracking-wider text-gray-800">SEOUL x BUSAN</h1>
+            <i class="fas fa-heart text-pink-500 ml-2"></i>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main id="app-content" class="max-w-md mx-auto px-4 mt-6 safe-area-pb"></main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 w-full bg-white border-t border-gray-200 z-50" style="padding-bottom: env(safe-area-inset-bottom);">
+        <div class="max-w-md mx-auto flex justify-around p-2">
+            <button onclick="switchTab('home')" id="tab-home" class="tab-btn active flex flex-col items-center p-2 rounded-xl w-1/3">
+                <i class="fas fa-info-circle text-xl mb-1"></i>
+                <span class="text-[10px] font-bold">總覽</span>
+            </button>
+            <button onclick="switchTab('schedule')" id="tab-schedule" class="tab-btn flex flex-col items-center p-2 rounded-xl w-1/3">
+                <i class="fas fa-calendar-alt text-xl mb-1"></i>
+                <span class="text-[10px] font-bold">行程</span>
+            </button>
+            <button onclick="switchTab('logistics')" id="tab-logistics" class="tab-btn flex flex-col items-center p-2 rounded-xl w-1/3">
+                <i class="fas fa-bed text-xl mb-1"></i>
+                <span class="text-[10px] font-bold">住宿攻略</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Application Logic -->
+    <script>
+        // --- 旅遊資料 ---
+        const itinerary = [
+            {
+                day: 1, date: '9/19 (六)', title: '紅眼救星！汗蒸幕與西區血拼', area: '機場 / 木洞 / 延南洞',
+                spots: [
+                    { time: '01:25', name: '搭乘紅眼航班出發', desc: '準備開啟韓國之旅！', link: 'https://map.naver.com/p/search/인천국제공항', icon: 'fa-plane', color: 'bg-emerald-100 text-emerald-600' },
+                    { time: '05:00', name: 'Spa at Home 汗蒸幕 & SES', desc: '下飛機先到仁川機場汗蒸幕補眠💤，起床後辦理 SES 自動通關。', link: 'https://map.naver.com/p/search/스파온에어', icon: 'fa-moon', color: 'bg-rose-100 text-rose-600' },
+                    { time: '09:30', name: '瑪弩飯店寄放行李', desc: '搭乘機場快線至首爾站寄放行李。', link: 'https://map.naver.com/p/search/호텔마누', icon: 'fa-bed', color: 'bg-indigo-100 text-indigo-600' },
+                    { time: '10:30', name: '現代百貨 木洞店', desc: '趁週末朝聖，鎖定 Longchamp 與 Celine！', link: 'https://naver.me/xhPamB2E', icon: 'fa-shopping-bag', color: 'bg-pink-100 text-pink-600' },
+                    { time: '13:30', name: '午餐：風川鰻魚 延南店', desc: '逛完百貨來吃烤鰻魚補充滿滿體力！(15:30休息)', link: 'https://naver.me/xuF9wl2h', icon: 'fa-utensils', color: 'bg-orange-100 text-orange-600' },
+                    { time: '15:30', name: '延南洞甜點時光', desc: 'Nesi Sabun (人生可朗芙)，或沿路尋找當季超紅的「無花果甜點」。', link: 'https://naver.me/Fpw3O1Lg', icon: 'fa-coffee', color: 'bg-amber-100 text-amber-600' },
+                    { time: '18:00', name: '晚餐：牛肉Wol牛肥腸', desc: '香氣四溢的烤牛腸！(週末營業至23:00)', link: 'https://naver.me/GtYu4oYk', icon: 'fa-utensils', color: 'bg-orange-100 text-orange-600' }
+                ],
+                backups: [
+                    { name: '花蟹世界 (醬蟹)', desc: '麻浦區宵夜備案，營業到 24:00！', link: 'https://naver.me/FBMhl9fg', icon: 'fa-utensils' }
+                ]
+            },
+            {
+                day: 2, date: '9/20 (日)', title: '穿梭古今！安國與皮卡丘快閃', area: '安國 / 鐘閣 / 益善洞',
+                spots: [
+                    { time: '07:30', name: '倫敦貝果博物館 安國店', desc: '07:00營業，建議提早去抽號碼牌。', link: 'https://naver.me/GII0UNU5', icon: 'fa-coffee', color: 'bg-amber-100 text-amber-600' },
+                    { time: '11:00', name: '北村 MLB 旗艦店', desc: '可以客製化專屬帽子！', link: 'https://naver.me/FAAzN4qH', icon: 'fa-shopping-bag', color: 'bg-pink-100 text-pink-600' },
+                    { time: '14:00', name: '皮卡丘球季出遊 (HiKR Ground)', desc: '位於清溪川旁的期間限定打卡點 (9/18-10/11)！', link: 'https://map.naver.com/p/search/하이커그라운드', icon: 'fa-ticket-alt', color: 'bg-blue-100 text-blue-600' },
+                    { time: '15:30', name: '益善洞 韓屋村', desc: '鐘路三街4號出口，穿梭韓屋村逛街。', link: 'https://map.naver.com/p/search/익선동한옥거리', icon: 'fa-camera', color: 'bg-blue-100 text-blue-600' },
+                    { time: '18:00', name: '晚餐自由行', desc: '在益善洞尋找特色韓料或烤肉。', link: 'https://map.naver.com/p/search/익선동%20맛집', icon: 'fa-utensils', color: 'bg-orange-100 text-orange-600' }
+                ],
+                backups: [
+                    { name: 'Hansabal 大排檔 新堂店', desc: '體驗道地大排檔氛圍，喝酒配美食 (17:00-03:00)。', link: 'https://naver.me/xxo7NEe5', icon: 'fa-utensils' }
+                ]
+            },
+            {
+                day: 3, date: '9/21 (一)', title: '首爾最潮！漢南洞與聖水洞', area: '漢南洞 / 新沙 / 聖水洞',
+                spots: [
+                    { time: '10:30', name: '漢南洞逛街：MUUT & verish', desc: '首爾必逛潮牌。', link: 'https://naver.me/FUi8jTux', icon: 'fa-shopping-bag', color: 'bg-pink-100 text-pink-600' },
+                    { time: '13:00', name: '午餐：面首爾 (Myeon Seoul)', desc: '位在江南新沙洞，順路吃午餐 (15:00休息)。', link: 'https://naver.me/5dh93BAh', icon: 'fa-utensils', color: 'bg-orange-100 text-orange-600' },
+                    { time: '14:30', name: 'Zenzero (Gelato 義式冰淇淋)', desc: '必吃米香(Riso)或招牌栗子蜂蜜！(新沙/江南皆有分店)', link: 'https://map.naver.com/p/search/젠제로', icon: 'fa-ice-cream', color: 'bg-amber-100 text-amber-600' },
+                    { time: '15:30', name: '聖水洞：Kuoca & ongredients', desc: '朝聖抹茶香水、verish，以及 ongredients 小黃乳快閃店拿贈品！', link: 'https://naver.me/5DZmc5qb', icon: 'fa-shopping-bag', color: 'bg-pink-100 text-pink-600' },
+                    { time: '19:00', name: '晚餐：Han 女士醬蟹', desc: '瑞草洞米其林推薦醬蟹，絕對不能錯過！', link: 'https://naver.me/GJZhcPQn', icon: 'fa-utensils', color: 'bg-orange-100 text-orange-600' }
+                ],
+                backups: []
+            },
+            {
+                day: 4, date: '9/22 (二)', title: '快閃雙殺！KTX前進釜山', area: '龍山 / 釜山廣安里',
+                spots: [
+                    { time: '10:00', name: '瑪弩飯店 Check-out', desc: '退房並將行李寄放。', link: 'https://map.naver.com/p/search/호텔마누', icon: 'fa-bed', color: 'bg-indigo-100 text-indigo-600' },
+                    { time: '10:30', name: '龍山 IPARK 快閃店巡禮', desc: '一次逛完「吉伊卡哇韓國」與「布丁狗餃子快閃 (至9/27)」！', link: 'https://naver.me/Fetqwf7C', icon: 'fa-shopping-bag', color: 'bg-pink-100 text-pink-600' },
+                    { time: '14:19', name: '搭乘 KTX 前往釜山', desc: '14:19 - 16:50 抵達釜山，完美銜接。', link: 'https://map.naver.com/p/search/서울역', icon: 'fa-train', color: 'bg-emerald-100 text-emerald-600' },
+                    { time: '17:30', name: 'Hotel 1 Check-in', desc: '抵達釜山廣安里，入住絕美海景飯店。', link: 'https://map.naver.com/p/search/호텔1', icon: 'fa-bed', color: 'bg-indigo-100 text-indigo-600' },
+                    { time: '18:30', name: 'Scentica 廣安', desc: '購買超人氣玫瑰身體油 (營業至21:00)。', link: 'https://naver.me/GzdZBWHR', icon: 'fa-shopping-bag', color: 'bg-pink-100 text-pink-600' },
+                    { time: '19:30', name: '晚餐：Gogyeol 烤肉', desc: '品嚐招牌稻草燻烤帶骨牛肋排！', link: 'https://naver.me/FDcxit4m', icon: 'fa-utensils', color: 'bg-orange-100 text-orange-600' }
+                ],
+                backups: []
+            },
+            {
+                day: 5, date: '9/23 (三)', title: '變美行程與西面田浦巡禮', area: '西面 / 廣安里',
+                spots: [
+                    { time: '11:30', name: '午餐：釜田市場', desc: '睡飽出發，去傳統市場吃明卵紫菜包飯。', link: 'https://naver.me/FVFo1IUk', icon: 'fa-utensils', color: 'bg-orange-100 text-orange-600' },
+                    { time: '13:30', name: '田浦下午茶：Nogadeulda Nok', desc: '享受人氣芒果抹茶冰。', link: 'https://naver.me/5Hy5Vv8j', icon: 'fa-coffee', color: 'bg-amber-100 text-amber-600' },
+                    { time: '16:00', name: '醫美：The First', desc: '✨ 已確認預約 16:00 變美行程！', link: 'https://map.naver.com/p/search/더퍼스트피부과의원%20부산', icon: 'fa-syringe', color: 'bg-rose-100 text-rose-600' },
+                    { time: '19:00', name: '晚餐：첨벙 (Chumbeong)', desc: '回廣安里吃海鮮控必吃的綜合生魚片與水拌生魚片套餐！', link: 'https://naver.me/xoGq7nGE', icon: 'fa-utensils', color: 'bg-orange-100 text-orange-600' },
+                    { time: '22:00', name: '宵夜：獵奇辣炒年糕', desc: '點東大門엽기떡볶이外送，配著無敵海景享用。', link: 'https://map.naver.com/p/search/동대문엽기떡볶이%20광안', icon: 'fa-utensils', color: 'bg-orange-100 text-orange-600' }
+                ],
+                backups: [
+                    { name: 'HOHOTEI 豬排 田浦總店', desc: '若釜田市場沒吃飽，可安排此為正餐備案。', link: 'https://naver.me/5NeUJ4mu', icon: 'fa-utensils' }
+                ]
+            },
+            {
+                day: 6, date: '9/24 (四)', title: '機張海岸線與海雲台絕景', area: '機張 / 青沙浦 / 海雲台',
+                spots: [
+                    { time: '10:00', name: 'Skyline Luge 釜山', de
